@@ -88,8 +88,8 @@ public class Passwords {
 		StringBuilder passwords = new StringBuilder();
 
 		for (int num = 0; num < n; ++num) {
-			Random randGen = new Random(); // needs to be changed ***
-			int seed = randGen.nextInt(100);
+			Random randGen = new Random();
+			int seed = randGen.nextInt(100); // needs to be changed ***
 
 			// get starting letter for this password
 			char startingLetter = getStartingLetter(seed, starters);
