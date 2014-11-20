@@ -57,7 +57,6 @@ public class Passwords {
 			for (int i = 0; i < word.length() - 1; i++) {
 
 				int letterIndexVal = (int)word.charAt(i) - 97;
-
 				if (letterIndexVal >= 0 && letterIndexVal < 26) {
 
 					// count the total number of times a
@@ -79,27 +78,31 @@ public class Passwords {
 
 				}
 
-				// ignore the char
-
 			}
 		}
 
 		writeFollowersTable(followers);
+		int startersTotal = getStartersTotal(starters);
+		int[] followersTotals = getFollowersTotals(followers);
 		StringBuilder passwords = new StringBuilder();
 
 		for (int num = 0; num < n; ++num) {
 			Random randGen = new Random();
-			int seed = randGen.nextInt(100); // needs to be changed ***
 
 			// get starting letter for this password
-			char startingLetter = getStartingLetter(seed, starters);
-			passwords.append(" " + startingLetter);
+			char previousLetter = getStartingLetter(starters,
+													startersTotal,
+													randGen);
+			passwords.append(" " + previousLetter);
 
 			// get intermediate and end letters for this password
-			for (int pChar = 0; pChar < k; ++pChar) {
-				seed = randGen.nextInt(100); // needs to be changed ***
-				char intermediateLetter = getIntermediateLetter(seed, followers, startingLetter);
+			for (int i = 0; i < k; ++i) {
+				char intermediateLetter = getIntermediateLetter(previousLetter,
+																followers,
+																followersTotals,
+																randGen);
 				passwords.append(intermediateLetter);
+				previousLetter = intermediateLetter;
 			}
 
 			passwords.append("\n");
@@ -111,25 +114,70 @@ public class Passwords {
 	}
 
 
-	static char getStartingLetter(int seed, int[] starters) {
-		return 'a'; // change ***
+
+	static int getStartersTotal(int[] starters) {
+		int sum = 0;
+
+		for (int i = 0; i < starters.length; ++i) {
+			sum += starters[i];
+		}
+
+		return sum;
 	}
 
 
 
-	static char getIntermediateLetter(int seed, int[][] followers, char startingLetter) {
+	static int[] getFollowersTotals(int[][] followers) {
+		int[] totals = new int[26];
+
+		for (int i = 0; i < followers.length; ++i) {
+
+			int sum = 0;
+			for (int j = 0; j < followers[0].length; ++j) {
+				sum += followers[i][j];
+			}
+
+			totals[i] = sum;
+		}
+
+		return totals;
+	}
+
+
+
+	static char getStartingLetter(int[] starters, int startersTotal, Random randGen) {
+		int seed = randGen.nextInt(startersTotal);
+
 		int sum = 0;
-		int startingLetterIndex = (int)startingLetter - 97;
+		for (int i = 0; i < starters.length; ++i) {
+
+			if (sum >= seed) {
+				return (char)(i + 97);
+			} else {
+				sum += starters[i];
+			}
+
+		}
+
+		return '-'; // should never be reached
+	}
+
+
+
+	static char getIntermediateLetter(char previousLetter, int[][] followers, int[] followersTotals, Random randGen) {
+		int sum = 0;
+		int previousLetterIndex = (int)previousLetter - 97;
+		int seed = randGen.nextInt(followersTotals[previousLetterIndex]);
 
 		for (int i = 0; i < followers[0].length; ++i) {
-			sum += followers[startingLetterIndex][i];
+			sum += followers[previousLetterIndex][i];
 
-			if (sum > seed) {
-				// return char
+			if (sum >= seed) {
+				return (char)(i + 97);
 			}
 		}
 
-		return 'a'; // change ***
+		return '-'; // should never be reached
 	}
 
 
