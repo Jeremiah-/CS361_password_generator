@@ -82,9 +82,9 @@ public class Passwords {
 		}
 
 		writeFollowersTable(followers);
-		int startersTotal = getStartersTotal(starters);
-		int[] followersTotals = getFollowersTotals(followers);
-		StringBuilder passwords = new StringBuilder();
+		int startersTotal = getStartersTotal(starters); // precomputation for getStarteringLetter() function
+		int[] followersTotals = getFollowersTotals(followers); // precomputation for getIntermediateLetter() function
+		StringBuilder passwords = new StringBuilder(); // append all passwords to the same StringBuilder() object
 
 		for (int num = 0; num < n; ++num) {
 			Random randGen = new Random();
@@ -95,14 +95,14 @@ public class Passwords {
 													randGen);
 			passwords.append(" " + previousLetter);
 
-			// get intermediate and end letters for this password
+			// get the rest of the letters for this password
 			for (int i = 0; i < k; ++i) {
 				char intermediateLetter = getIntermediateLetter(previousLetter,
 																followers,
 																followersTotals,
 																randGen);
 				passwords.append(intermediateLetter);
-				previousLetter = intermediateLetter;
+				previousLetter = intermediateLetter; // this current letter will become the next loop's previous letter
 			}
 
 			passwords.append("\n");
@@ -115,6 +115,8 @@ public class Passwords {
 
 
 
+	// This function returns the sum of all the frequencies of
+	// starting letters in the reference text.
 	static int getStartersTotal(int[] starters) {
 		int sum = 0;
 
@@ -127,6 +129,8 @@ public class Passwords {
 
 
 
+	// This function returns an array of sums of all the frequencies of
+	// intermediately occurring letters in the reference text.
 	static int[] getFollowersTotals(int[][] followers) {
 		int[] totals = new int[26];
 
@@ -145,7 +149,13 @@ public class Passwords {
 
 
 
-	static char getStartingLetter(int[] starters, int startersTotal, Random randGen) {
+	// This function takes some gacky parameters in order to
+	// simply return the first letter of a password,
+	// based on the starting letter frequencies info acquired
+	// from the reference text.
+	static char getStartingLetter(int[] starters,
+									int startersTotal,
+									Random randGen) {
 		int seed = randGen.nextInt(startersTotal);
 
 		int sum = 0;
@@ -164,7 +174,14 @@ public class Passwords {
 
 
 
-	static char getIntermediateLetter(char previousLetter, int[][] followers, int[] followersTotals, Random randGen) {
+	// This function takes some gacky parameters in order to
+	// simply return an intermediately occurring letter of a password,
+	// based on the follower letter frequencies info acquired
+	// from the reference text, as well as the character that it is following, "previousLetter.""
+	static char getIntermediateLetter(char previousLetter,
+										int[][] followers,
+										int[] followersTotals,
+										Random randGen) {
 		int sum = 0;
 		int previousLetterIndex = (int)previousLetter - 97;
 		int seed = randGen.nextInt(followersTotals[previousLetterIndex]);
@@ -181,6 +198,9 @@ public class Passwords {
 	}
 
 
+
+	// function used to format and write out the followers table
+	// to a file
 	static void writeFollowersTable(int[][] followers) throws IOException {
 
 		// setup FileWriter
