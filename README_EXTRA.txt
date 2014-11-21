@@ -6,9 +6,18 @@ EMAIL: kaelin@cs.utexas.edu; Jeremiah.H.Martinez@utexas.edu;
 
 [Program 5]
 [Description]
+
+Extra credit description:
+In order to run this program, enter "java Passwords reference-Filename N k rejectWordsFile"
+The only difference between this and the original is the rejectWordsFile. This file contains
+all the words (4 letters or more) that if are a substring of a generated password, will make the 
+password void. Rejected passwords will be shown on the terminal along with the substring that
+made them rejects.
+
+DESCRIPTION BELOW IS THE SAME AS THE ORIGINAL README
 This program creates random passwords based on the frequency of how a letter follows another in a word, from a given file (Example: “True”, “r” follows “T”).
-To run it use 'java Passwords reference-Filename N k', where reference-filename is the file you want to base the letter frequencies from, N the number of passwords to produce, and k the length of the passwords.
-There is only one file that does everything, Passwords.java, in the main method, with helper methods that do non-essential things. The main function is creating the passwords, which is done by taking the sum of the number of times the current letter has appeared behind each letter of the alphabet inside the file and creating a random number that falls between 0 and the sum. Each letter will have varying ranges and the next letter in the password is determined by where the random number falls.
+To run it use 'java Passwords reference-Filename N k rejectWordsFile', where reference-filename is the file you want to base the letter frequencies from, N the number of passwords to produce, and k the length of the passwords.
+There is only one file, Passwords.java, that does everything in the main method, with helper methods that do non-essential things. The main function is creating the passwords, which is done by taking the sum of the number of times the current letter has appeared behind each letter of the alphabet inside the file and creating a random number that falls between 0 and the sum. Each letter will have varying ranges and the next letter in the password is determined by where the random number falls.
 Everything prints to the terminal but the table is very large so make sure to enlarge the terminal to max capacity.
 
 [Finish]
@@ -22,10 +31,9 @@ The size of the file is 938.8 kB
  
 [Test Cases]
 [Input of test 1]
-java Passwords words.pre-dictionaries-common 15 15
+java Passwords_extra words.pre-dictionaries-common 10 10 words.pre-dictionaries-common
 
 [Output of test 1]
-
             A     B     C     D     E     F     G     H     I     J     K     L     M     N     O     P     Q     R     S     T     U     V     W     X     Y     Z     
 A:         63  2180  3524  2360   235   580  1883   309  2078    71   798  5750  2455  8538    74  1996    78  7397  3398  9184  1251   995   594   198   910   360
 
@@ -78,28 +86,22 @@ X:        126     3   158     0   269     6     3    63   337     0     0     8 
 Y:        424   129   261   135   456    47    85    52   374     7    16   279   318   282   241   348     2   217   359   146    82     9   102    19     5    26
 
 Z:        468     7     2     1   958     0     1    30   544     0     4    92    12    12   183    12     3     6     5     9    41     9    10     0    27   222
+Rejected password "fetepilerg" because of substring "pile"
+Rejected password "dirileralu" because of substring "rile"
+Rejected password "werollatin" because of substring "latin"
+Rejected password "cadandatto" because of substring "adan"
+Rejected password "dideartush" because of substring "dear"
 Passwords are:
- ffissstherbestia
- tinacasonulefrea
- tctiogatizexenlp
- qurboyazampuphne
- mutroorscollasha
- wptogominnringig
- viseecltwormanec
- bitantecoutrilin
- binkncisonegenco
- tisutoosprllexis
- cemamoallereanon
- nerieliolencovar
- nembiclthendexan
- shtabeaymbleainf
- wardiguninslleli
+ ucudurecit
+ doinereyar
+ ucedoontac
+ tzerrinare
+ ltebeosmen
 
 [Input of test 2]
-java Passwords words.pre-dictionaries-common 15 10
+java Passwords_extra words.pre-dictionaries-common 15 5 words.pre-dictionaries-common
 
 [Output of test 2]
-
             A     B     C     D     E     F     G     H     I     J     K     L     M     N     O     P     Q     R     S     T     U     V     W     X     Y     Z     
 A:         63  2180  3524  2360   235   580  1883   309  2078    71   798  5750  2455  8538    74  1996    78  7397  3398  9184  1251   995   594   198   910   360
 
@@ -153,28 +155,27 @@ Y:        424   129   261   135   456    47    85    52   374     7    16   279 
 
 Z:        468     7     2     1   958     0     1    30   544     0     4    92    12    12   183    12     3     6     5     9    41     9    10     0    27   222
 Passwords are:
- qurineditel
- ginteunerva
- esuentifopp
- ghituasabul
- queronkleee
- blivisetifr
- heradicassi
- qubudytispe
- dlonnderant
- nestelovees
- bidunkenson
- sinitesqust
- ueneankines
- mateocorzor
- coosintivee
+ fentt
+ evyig
+ nspon
+ tocar
+ enena
+ xelon
+ nenti
+ xtima
+ jintl
+ dspmm
+ qusat
+ ncere
+ xpusy
+ inimp
+ lonkl
 
 
 [Input of test 3]
-java Passwords words.pre-dictionaries-common 15 5
+java Passwords_extra words.pre-dictionaries-common 15 8 words.pre-dictionaries-common
 
 [Output of test 3]
-
             A     B     C     D     E     F     G     H     I     J     K     L     M     N     O     P     Q     R     S     T     U     V     W     X     Y     Z     
 A:         63  2180  3524  2360   235   580  1883   309  2078    71   798  5750  2455  8538    74  1996    78  7397  3398  9184  1251   995   594   198   910   360
 
@@ -227,29 +228,28 @@ X:        126     3   158     0   269     6     3    63   337     0     0     8 
 Y:        424   129   261   135   456    47    85    52   374     7    16   279   318   282   241   348     2   217   359   146    82     9   102    19     5    26
 
 Z:        468     7     2     1   958     0     1    30   544     0     4    92    12    12   183    12     3     6     5     9    41     9    10     0    27   222
+Rejected password "hophocke" because of substring "hock"
+Rejected password "peristis" because of substring "eris"
+Rejected password "jazaicon" because of substring "icon"
+Rejected password "thecoine" because of substring "coin"
+Rejected password "bophessa" because of substring "hess"
 Passwords are:
- tugola
- givige
- gagera
- qublop
- tinfis
- sellti
- steses
- bacifi
- qumpul
- ckemef
- dexero
- dionca
- tianas
- hatelp
- jakich
+ qunilapl
+ ttoweone
+ xtnimumy
+ ddituter
+ menstskm
+ eghaynte
+ irereren
+ sestonco
+ womncuit
+ ncivinin
 
 
 [Input of test 4]
-java Passwords words.pre-dictionaries-common 30 10
+java Passwords_extra words.pre-dictionaries-common 15 16 words.pre-dictionaries-common
 
 [Output of test 4]
-
             A     B     C     D     E     F     G     H     I     J     K     L     M     N     O     P     Q     R     S     T     U     V     W     X     Y     Z     
 A:         63  2180  3524  2360   235   580  1883   309  2078    71   798  5750  2455  8538    74  1996    78  7397  3398  9184  1251   995   594   198   910   360
 
@@ -302,35 +302,21 @@ X:        126     3   158     0   269     6     3    63   337     0     0     8 
 Y:        424   129   261   135   456    47    85    52   374     7    16   279   318   282   241   348     2   217   359   146    82     9   102    19     5    26
 
 Z:        468     7     2     1   958     0     1    30   544     0     4    92    12    12   183    12     3     6     5     9    41     9    10     0    27   222
+Rejected password "ndwomirsminethbo" because of substring "mine"
+Rejected password "uconoupohucerier" because of substring "erie"
+Rejected password "oreascitesprpovo" because of substring "cite"
+Rejected password "lmisshureargieni" because of substring "miss"
+Rejected password "ingingenieliokec" because of substring "genie"
+Rejected password "balatseshysetisw" because of substring "lats"
+Rejected password "haukenudintffapo" because of substring "dint"
+Rejected password "eroseryaptebioin" because of substring "eros"
+Rejected password "qulcotinmorongnv" because of substring "moro"
+Rejected password "xpeleandlalitust" because of substring "alit"
 Passwords are:
- cpsaspentin
- cenatendioh
- cephitymepi
- sthriesoter
- urmpoygrvat
- nclluncouou
- belsshanntr
- quronalelow
- unebifuenct
- dindantitit
- dexelistonc
- fongmedrneo
- vedinedabon
- chighoxhind
- upogalornsu
- tinginerlel
- vexpracuden
- ccouencatio
- coldouramer
- deamivatela
- bparfudiler
- phetateroay
- ufictherurd
- ssuexunpolu
- dlettillemo
- thenateenig
- stellaneurs
- metideronis
- bogevebingo
- sounangrnet
+ ioinuedlareondin
+ oysnndenpeveulud
+ entwalapiverocol
+ nereleresmerived
+ tistechuneavafio
+
 
