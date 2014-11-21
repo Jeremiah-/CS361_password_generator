@@ -116,7 +116,7 @@ public class Passwords_extra {
 			password.append(previousLetter);
 
 			// get the rest of the letters for this password
-			for (int i = 0; i < k; i++) {
+			for (int i = 1; i < k; i++) {
 				char intermediateLetter = getIntermediateLetter(previousLetter,
 																followers,
 																followersTotals,
