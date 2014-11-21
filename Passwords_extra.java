@@ -116,7 +116,7 @@ public class Passwords_extra {
 			password.append(previousLetter);
 
 			// get the rest of the letters for this password
-			for (int i = 0; i < k; ++i) {
+			for (int i = 0; i < k; i++) {
 				char intermediateLetter = getIntermediateLetter(previousLetter,
 																followers,
 																followersTotals,
@@ -130,7 +130,7 @@ public class Passwords_extra {
 			outerLoop:
 			for (String s : rejectWords) {
 				if (s.length() > 3 && pw.contains(s.subSequence(0, s.length()))) {
-					System.out.println("Rejected password: " + pw);
+					System.out.println("Rejected password \"" + pw + "\" because of substring \"" + s + "\"");
 					containsReject = true;
 					break outerLoop;
 				}
