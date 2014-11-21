@@ -5,16 +5,18 @@ import java.util.Scanner;
 import java.io.FileNotFoundException;
 import java.util.Random;
 import java.lang.StringBuilder;
+import java.util.TreeSet;
+import java.util.ArrayList;
 
-public class Passwords {
+public class Passwords_extra {
 
 	public static void main(String args[]) throws IOException {
 
-		if (args.length < 3) {
-			System.out.println("Error: not enough arguments given. Format should be \'Passwords reference-Filename N k\'");
+		if (args.length < 4) {
+			System.out.println("Error: not enough arguments given. Format should be \'Passwords reference-Filename N k reject-file\'");
 			return;
-		} else if (args.length > 3) {
-			System.out.println("Error: too many arguments given. Format should be \'Passwords reference-Filename N k\'");
+		} else if (args.length > 4) {
+			System.out.println("Error: too many arguments given. Format should be \'Passwords reference-Filename N k reject-file\'");
 			return;
 		}
 
@@ -26,10 +28,14 @@ public class Passwords {
 		// the length of the passwords
 		int k = Integer.parseInt(args[2]);
 
+		String rejectWordsFileName = args[3];
+
 		File referenceTextFile;
+		File rejectTextFile;
 
 		try {
 			referenceTextFile = new File(referenceTextFileName);
+			rejectTextFile = new File(rejectWordsFileName);
 		} catch (NullPointerException e) {
 			System.out.println("Error: file name given is null.");
 			return;
@@ -40,14 +46,18 @@ public class Passwords {
 		int[] starters = new int[26];
 
 		Scanner fileReader;
+		Scanner rejectReader;
 
 		try {
 			fileReader = new Scanner(referenceTextFile);
+			rejectReader = new Scanner(rejectTextFile);
 		} catch (FileNotFoundException e) {
 			System.out.println("Error: file name given was not found.");
 			return;
 		}
 
+
+		// reads the file and constructs the followers table
 		while (fileReader.hasNext()) {
 			String word = fileReader.next().toLowerCase();
 			boolean isStartOfWord = true;
@@ -81,10 +91,20 @@ public class Passwords {
 			}
 		}
 
+
+		// reads through the reject file and stores the words
+		// TODO: doesn't consider non-letters.
+		TreeSet<String> rejectWords = new TreeSet<String>();
+		while (rejectReader.hasNext()) {
+			rejectWords.add(rejectReader.next().toLowerCase());
+		}
+
 		writeFollowersTable(followers);
 		int startersTotal = getStartersTotal(starters); // precomputation for getStarteringLetter() function
 		int[] followersTotals = getFollowersTotals(followers); // precomputation for getIntermediateLetter() function
-		StringBuilder passwords = new StringBuilder(); // append all passwords to the same StringBuilder() object
+		StringBuilder password = new StringBuilder(); // append all passwords to the same StringBuilder() object
+		ArrayList<String> passWords = new ArrayList<String>();
+		boolean containsReject = false;
 
 		for (int num = 0; num < n; ++num) {
 			Random randGen = new Random();
@@ -93,7 +113,7 @@ public class Passwords {
 			char previousLetter = getStartingLetter(starters,
 													startersTotal,
 													randGen);
-			passwords.append(" " + previousLetter);
+			password.append(previousLetter);
 
 			// get the rest of the letters for this password
 			for (int i = 0; i < k; ++i) {
@@ -101,15 +121,35 @@ public class Passwords {
 																followers,
 																followersTotals,
 																randGen);
-				passwords.append(intermediateLetter);
+				password.append(intermediateLetter);
 				previousLetter = intermediateLetter; // this current letter will become the next loop's previous letter
 			}
 
-			passwords.append("\n");
+			String pw = password.toString();
+
+			outerLoop:
+			for (String s : rejectWords) {
+				if (s.length() > 3 && pw.contains(s.subSequence(0, s.length()))) {
+					System.out.println("Rejected password: " + pw);
+					containsReject = true;
+					break outerLoop;
+				}
+			}
+
+			if (!containsReject) {
+				passWords.add(pw);
+			}
+
+			password.delete(0, password.length());
+			// passwords.append("\n");
 		}
 
 		System.out.println("Passwords are:");
-		System.out.print(passwords.toString());
+
+		for (int i = 0; i < passWords.size(); i++) {
+			System.out.println(" " + passWords.get(i));
+		}
+		// System.out.print(passwords.toString());
 
 	}
 
