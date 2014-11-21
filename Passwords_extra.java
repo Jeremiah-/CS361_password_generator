@@ -141,6 +141,7 @@ public class Passwords_extra {
 			}
 
 			password.delete(0, password.length());
+			containsReject = false;
 			// passwords.append("\n");
 		}
 
