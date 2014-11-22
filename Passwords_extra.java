@@ -8,7 +8,7 @@ import java.lang.StringBuilder;
 import java.util.TreeSet;
 import java.util.ArrayList;
 
-public class Passwords_extra {
+public class Passwords_3 {
 
 	public static void main(String args[]) throws IOException {
 
@@ -46,7 +46,8 @@ public class Passwords_extra {
 			return;
 		}
 
-		int[][] followers = new int[26][26];
+		int[][][] followers = new int[26][26][26];
+		int[][] secondLetterFollowers = new int[26][26];
 		int[] counts = new int[26];
 		int[] starters = new int[26];
 
@@ -66,9 +67,11 @@ public class Passwords_extra {
 		while (fileReader.hasNext()) {
 			String word = fileReader.next().toLowerCase();
 			boolean isStartOfWord = true;
+			boolean isSecondLetter = false;
 			// treat '-' as two seperate words. other characters just ignore and treat as one word.
 
 			int previousLetterVal = -1;
+			int prepreLetterVal = -1;
 			for (int i = 0; i < word.length() - 1; i++) {
 
 				int letterIndexVal = (int)word.charAt(i) - 97;
@@ -84,10 +87,16 @@ public class Passwords_extra {
 						// record occurrence of starting letter
 						starters[letterIndexVal] += 1;
 						isStartOfWord = false;
+						isSecondLetter = true;
+					} else if (isSecondLetter) {
+						isSecondLetter = false;
+						secondLetterFollowers[previousLetterVal][letterIndexVal] += 1;
 					} else {
-						followers[previousLetterVal][letterIndexVal] += 1;
+						secondLetterFollowers[prepreLetterVal][previousLetterVal] += 1; // for the first layer matrix to get second letter
+						followers[prepreLetterVal][previousLetterVal][letterIndexVal] += 1; // this is the rest of the matrix used for rest of password letters
 					}
 
+					prepreLetterVal = previousLetterVal;
 					previousLetterVal = letterIndexVal;
 					isStartOfWord = (i == word.length() - 1) ? true : false;
 
@@ -104,9 +113,10 @@ public class Passwords_extra {
 			rejectWords.add(rejectReader.next().toLowerCase());
 		}
 
-		writeFollowersTable(followers);
+		// writeFollowersTable(followers);
 		int startersTotal = getStartersTotal(starters); // precomputation for getStarteringLetter() function
-		int[] followersTotals = getFollowersTotals(followers); // precomputation for getIntermediateLetter() function
+		int[] secondLetterTotals = getFirstMatrixTotals(secondLetterFollowers); // this is the same as the original assignment, just for the second letter now
+		int[][] followersTotals = getFollowersTotals(followers); // precomputation for getIntermediateLetter() function
 		StringBuilder password = new StringBuilder(); // append all passwords to the same StringBuilder() object
 		ArrayList<String> passWords = new ArrayList<String>();
 		boolean containsReject = false;
@@ -115,19 +125,32 @@ public class Passwords_extra {
 			Random randGen = new Random();
 
 			// get starting letter for this password
-			char previousLetter = getStartingLetter(starters,
-													startersTotal,
-													randGen);
-			password.append(previousLetter);
+			char prepreLetter = '-';
+			char previousLetter = '-';
+			if (k > 1) {
+				prepreLetter = getStartingLetter(starters,
+														startersTotal,
+														randGen);
+				password.append(prepreLetter);
+			}
+
+			if (k > 2) {
+				// TODO: get second letter
+				previousLetter = getSecondLetter(prepreLetter, secondLetterFollowers, secondLetterTotals, randGen);
+				password.append(previousLetter);
+			}
 
 			// get the rest of the letters for this password
-			for (int i = 1; i < k; i++) {
-				char intermediateLetter = getIntermediateLetter(previousLetter,
-																followers,
-																followersTotals,
-																randGen);
-				password.append(intermediateLetter);
-				previousLetter = intermediateLetter; // this current letter will become the next loop's previous letter
+			if (k > 3) {
+				for (int i = 2; i < k; i++) {
+					char intermediateLetter = getIntermediateLetter(prepreLetter, previousLetter,
+																	followers,
+																	followersTotals,
+																	randGen);
+					password.append(intermediateLetter);
+					prepreLetter = previousLetter;
+					previousLetter = intermediateLetter; // this current letter will become the next loop's previous letter
+				}
 			}
 
 			String pw = password.toString();
@@ -174,20 +197,40 @@ public class Passwords_extra {
 	}
 
 
-
-	// This function returns an array of sums of all the frequencies of
-	// intermediately occurring letters in the reference text.
-	static int[] getFollowersTotals(int[][] followers) {
+	static int[] getFirstMatrixTotals(int[][] secondLetterFollowers) {
 		int[] totals = new int[26];
 
-		for (int i = 0; i < followers.length; ++i) {
+		for (int i = 0; i < secondLetterFollowers.length; ++i) {
 
 			int sum = 0;
-			for (int j = 0; j < followers[0].length; ++j) {
-				sum += followers[i][j];
+			for (int j = 0; j < secondLetterFollowers[0].length; ++j) {
+				sum += secondLetterFollowers[i][j];
 			}
 
 			totals[i] = sum;
+		}
+
+		return totals;
+	}
+
+	// This function returns an array of sums of all the frequencies of
+	// intermediately occurring letters in the reference text.
+	static int[][] getFollowersTotals(int[][][] followers) {
+		int[][] totals = new int[26][26];
+
+		//  imagine it as x and y are coordinates on a flat map and we're recordring how
+		// deep each x,y coordinate is
+		for (int x = 0; x < followers.length; ++x) {
+			for (int y = 0; y < followers[0].length; ++y) {
+				int sum = 0;
+				for (int z = 0; z < followers[0][0].length; z++) {
+					sum += followers[x][y][z];
+				}
+
+				totals[x][y] = sum;
+			}
+
+			
 		}
 
 		return totals;
@@ -205,7 +248,12 @@ public class Passwords_extra {
 		int seed = randGen.nextInt(startersTotal);
 
 		int sum = 0;
+
+		// used if the seed is never greater than the sum
+		// (can happen if at the end of array)
+		int lastNonZero = 0; 
 		for (int i = 0; i < starters.length; ++i) {
+
 			sum += starters[i];
 			if (sum >= seed) {
 				return (char)(i + 97);
@@ -213,86 +261,59 @@ public class Passwords_extra {
 
 		}
 
-		return '-'; // should never be reached
+
+
+		System.out.println("printed - in getStartingLetter()");
+		System.out.printf("sum: %d\n", sum);
+		System.out.printf("seed: %d\n", seed);
+		return 'z'; // should never be reached
 	}
 
-
-
-	// This function takes some gacky parameters in order to
-	// simply return an intermediately occurring letter of a password,
-	// based on the follower letter frequencies info acquired
-	// from the reference text, as well as the character that it is following, "previousLetter.""
-	static char getIntermediateLetter(char previousLetter,
-										int[][] followers,
-										int[] followersTotals,
-										Random randGen) {
+	static char getSecondLetter(char previousLetter, int[][] secondLetterFollowers, 
+													int[] firstLayerTotals,
+													Random randGen){
 		int sum = 0;
 		int previousLetterIndex = (int)previousLetter - 97;
-		int seed = randGen.nextInt(followersTotals[previousLetterIndex]);
+		int seed = randGen.nextInt(firstLayerTotals[previousLetterIndex]);
 
-		for (int i = 0; i < followers[0].length; ++i) {
-			sum += followers[previousLetterIndex][i];
+		for (int i = 0; i < secondLetterFollowers[0].length; ++i) {
+			sum += secondLetterFollowers[previousLetterIndex][i];
 
 			if (sum >= seed) {
 				return (char)(i + 97);
 			}
 		}
 
+		System.out.println("printed - in getSecondLetter()");
+
 		return '-'; // should never be reached
+
 	}
 
+	// This function takes some gacky parameters in order to
+	// simply return an intermediately occurring letter of a password,
+	// based on the follower letter frequencies info acquired
+	// from the reference text, as well as the character that it is following, "previousLetter.""
+	static char getIntermediateLetter(char prepreLetter, 
+										char previousLetter,
+										int[][][] followers,
+										int[][] followersTotals,
+										Random randGen) {
+		int sum = 0;
+		int prepreLetterIndex = (int)prepreLetter - 97;
+		int previousLetterIndex = previousLetter - 97;
+		int seed = randGen.nextInt(followersTotals[prepreLetterIndex][previousLetterIndex]);
 
+		for (int i = 0; i < followers[0][0].length; ++i) {
+			sum += followers[prepreLetterIndex][previousLetterIndex][i];
 
-	// function used to format and write out the followers table
-	// to a file
-	static void writeFollowersTable(int[][] followers) throws IOException {
-
-		// setup FileWriter
-		// File followersTableFile;
-
-		// try {
-		// 	followersTableFile = new File("followersTable.txt");
-		// } catch (NullPointerException e) {
-		// 	System.out.println("Error: file name given is null.");
-		// 	return;
-		// }
-
-		// followersTableFile.createNewFile();
-		// FileWriter writer = new FileWriter(followersTableFile);
-
-
-		// print letters for column title
-		for (int i = 0; i < followers.length; ++i) {
-			char colLetter = (char)(i + 65);
-
-			if (i == 0) {
-				// writer.write("            ");
-				System.out.print("            ");
+			if (sum >= seed) {
+				return (char)(i + 97);
 			}
-
-			// writer.write(colLetter + "     ");
-			System.out.print(colLetter + "     ");
 		}
 
-		// print row titles and frequencies in followers table
-		for (int i = 0; i < followers.length; ++i) {
-			char rowLetter = (char)(i + 65); // letter for row title
-			// writer.write("\n" + rowLetter + ":     ");
-			System.out.print("\n" + rowLetter + ":     ");
-
-			for (int j = 0; j < followers[0].length; ++j) {
-				String formattedString = String.format("%6d", followers[i][j]);
-				// writer.write(formattedString);
-				System.out.print(formattedString);
-			}
-
-			// writer.write("\n");
-			System.out.print("\n");
-		}
-
-		// writer.flush();
-		// writer.close();
-
+		System.out.println("Printed - in getIntermediateLetter()");
+		return '-'; // should never be reached
 	}
 
 
