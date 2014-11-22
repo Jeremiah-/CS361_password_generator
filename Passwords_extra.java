@@ -28,6 +28,11 @@ public class Passwords_extra {
 		// the length of the passwords
 		int k = Integer.parseInt(args[2]);
 
+		if (n < 1 || k < 1) {
+			System.out.println("N and k must be > 1");
+			return;
+		}
+
 		String rejectWordsFileName = args[3];
 
 		File referenceTextFile;
@@ -201,11 +206,9 @@ public class Passwords_extra {
 
 		int sum = 0;
 		for (int i = 0; i < starters.length; ++i) {
-
+			sum += starters[i];
 			if (sum >= seed) {
 				return (char)(i + 97);
-			} else {
-				sum += starters[i];
 			}
 
 		}

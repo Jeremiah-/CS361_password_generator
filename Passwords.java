@@ -26,6 +26,11 @@ public class Passwords {
 		// the length of the passwords
 		int k = Integer.parseInt(args[2]);
 
+		if (n < 1 || k < 1) {
+			System.out.println("N and k must be > 1");
+			return;
+		}
+
 		File referenceTextFile;
 
 		try {
@@ -109,7 +114,7 @@ public class Passwords {
 		}
 
 		System.out.println("Passwords are:");
-		System.out.print(passwords.toString());
+		System.out.print(" " + passwords.toString());
 
 	}
 
@@ -160,11 +165,9 @@ public class Passwords {
 
 		int sum = 0;
 		for (int i = 0; i < starters.length; ++i) {
-
+			sum += starters[i];
 			if (sum >= seed) {
 				return (char)(i + 97);
-			} else {
-				sum += starters[i];
 			}
 
 		}
